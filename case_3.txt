@@ -1,0 +1,137 @@
+Программное обеспечение для информационных систем на архитектуре веб-приложений:
+Энтерпрайз-решения (Enterprise Solutions):
+
+SAP ERP, Oracle ERP, Microsoft Dynamics: Эти системы предоставляют комплексные решения для управления предприятием, включая финансы, управление ресурсами, продажи и т.д. Они основаны на архитектуре веб-приложений, что позволяет им быть доступными через веб-интерфейсы и поддерживать масштабирование для крупных компаний.
+CRM-системы (Customer Relationship Management):
+
+Salesforce, Microsoft Dynamics CRM, Zoho CRM: Эти системы используются для управления взаимоотношениями с клиентами. Они часто предоставляют веб-интерфейсы для доступа к данным и функционалу, что позволяет сотрудникам компании работать с клиентской информацией из любой точки мира.
+Системы управления содержимым (Content Management Systems, CMS):
+
+WordPress, Drupal, Joomla: CMS позволяют создавать и управлять веб-сайтами, используя веб-интерфейс для управления контентом, пользовательскими правами доступа и другими функциями.
+Электронная коммерция (E-commerce):
+
+Shopify, Magento, WooCommerce (для WordPress): Платформы электронной коммерции позволяют компаниям создавать онлайн-магазины и управлять продажами через веб-интерфейсы.
+Возможности систем на архитектуре веб-приложений:
+Доступность из любой точки мира: Веб-приложения обеспечивают доступ к данным и функционалу через веб-браузеры, что позволяет пользователям работать с системой независимо от местонахождения.
+Масштабируемость: Веб-приложения могут быть легко масштабированы для поддержки растущего числа пользователей и объема данных.
+Интеграция с другими системами: Возможность интеграции с другими веб-сервисами и внешними API для обмена данными.
+Удобство в управлении и обновлениях: Централизованное управление приложением и обновлениями через веб-интерфейс администратора.
+
+Пример создания веб-приложения с использованием Delphi и MS IIS
+
+Для создания примера клиент-серверного приложения на языке Delphi с использованием MS IIS и MS SQL Server в качестве базы данных, давайте рассмотрим простой пример. Мы создадим простую веб-форму на Delphi, которая будет взаимодействовать с базой данных через сервер IIS.
+
+Пример: Управление списком задач
+Этот пример представляет собой простое веб-приложение для управления списком задач. Клиентская часть будет создана на Delphi, а серверная часть настроена на MS IIS с подключением к MS SQL Server.
+
+Шаги создания примера:
+Создание базы данных в MS SQL Server:
+
+Создайте новую базу данных с названием TaskManagerDB.
+Создайте таблицу Tasks с полями:
+TaskID (int, автоинкремент)
+TaskName (nvarchar(100))
+TaskDescription (nvarchar(max))
+TaskStatus (nvarchar(50))
+Пример SQL-скрипта для создания таблицы:
+  CREATE TABLE Tasks (
+    TaskID INT PRIMARY KEY IDENTITY,
+    TaskName NVARCHAR(100),
+    TaskDescription NVARCHAR(MAX),
+    TaskStatus NVARCHAR(50)
+);
+Создание Delphi приложения:
+
+Создайте новый проект в Delphi.
+Добавьте компонент TIdHTTP для работы с HTTP-запросами на сервер.
+Создайте форму с элементами управления для ввода данных задачи (например, TEdit и TMemo для имени и описания задачи) и кнопками для добавления задачи и получения списка задач.
+Написание кода клиентской части в Delphi:
+
+Реализуйте логику отправки HTTP-запросов к серверу IIS для добавления новой задачи и получения списка задач.
+Пример кода для отправки POST-запроса на сервер для добавления новой задачи:
+
+procedure AddTask(TaskName, TaskDescription: string);
+var
+  HTTPClient: TIdHTTP;
+  Params: TStringList;
+begin
+  HTTPClient := TIdHTTP.Create(nil);
+  Params := TStringList.Create;
+  try
+    Params.Add('TaskName=' + TaskName);
+    Params.Add('TaskDescription=' + TaskDescription);
+    HTTPClient.Post('http://yourserverurl/addtask', Params);
+  finally
+    Params.Free;
+    HTTPClient.Free;
+  end;
+end;
+Пример кода для отправки GET-запроса на сервер для получения списка задач:
+function GetTasks: string;
+var
+  HTTPClient: TIdHTTP;
+begin
+  HTTPClient := TIdHTTP.Create(nil);
+  try
+    Result := HTTPClient.Get('http://yourserverurl/gettasks');
+  finally
+    HTTPClient.Free;
+  end;
+end;
+оздание серверного приложения на MS IIS:
+
+Настройте MS IIS для принятия HTTP-запросов от клиентского приложения на Delphi.
+Создайте ASP.NET приложение (или любое другое веб-приложение) для обработки запросов.
+Напишите код на сервере для обработки запросов на добавление задачи (addtask.aspx) и получение списка задач (gettasks.aspx).
+Пример кода для addtask.aspx:
+
+
+  <%@ Page Language="C#" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<%
+string taskName = Request.Form["TaskName"];
+string taskDescription = Request.Form["TaskDescription"];
+
+string connectionString = "your_connection_string_here";
+using (SqlConnection connection = new SqlConnection(connectionString))
+{
+    string query = "INSERT INTO Tasks (TaskName, TaskDescription, TaskStatus) VALUES (@TaskName, @TaskDescription, 'New')";
+    SqlCommand command = new SqlCommand(query, connection);
+    command.Parameters.AddWithValue("@TaskName", taskName);
+    command.Parameters.AddWithValue("@TaskDescription", taskDescription);
+
+    connection.Open();
+    command.ExecuteNonQuery();
+}
+Response.Write("Task added successfully.");
+%>
+Пример кода для gettasks.aspx:
+
+<%@ Page Language="C#" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<%
+string connectionString = "your_connection_string_here";
+using (SqlConnection connection = new SqlConnection(connectionString))
+{
+    string query = "SELECT TaskID, TaskName, TaskDescription, TaskStatus FROM Tasks";
+    SqlCommand command = new SqlCommand(query, connection);
+
+    connection.Open();
+    SqlDataReader reader = command.ExecuteReader();
+
+    while (reader.Read())
+    {
+        Response.Write("TaskID: " + reader["TaskID"] + "<br>");
+        Response.Write("TaskName: " + reader["TaskName"] + "<br>");
+        Response.Write("TaskDescription: " + reader["TaskDescription"] + "<br>");
+        Response.Write("TaskStatus: " + reader["TaskStatus"] + "<br><br>");
+    }
+
+    reader.Close();
+}
+%>
+Настройка и тестирование:
+
+Разверните серверное приложение на MS IIS.
+Запустите клиентское приложение на Delphi и проверьте взаимодействие с базой данных через серверное приложение.
+Этот пример демонстрирует базовое взаимодействие клиент-серверной архитектуры на основе веб-технологий с использованием Delphi, MS IIS и MS SQL Server.
